@@ -22,6 +22,52 @@ end
 
 include_recipe "my-environment::permissions"
 
+directory "/var/www/cirujanos" do
+  owner 'vagrant'
+  group 'vagrant'
+  recursive true
+end
+
+directory "/var/www/cirujanos/static" do
+  owner 'vagrant'
+  group 'vagrant'
+  recursive true
+end
+
+directory "/var/www/cirujanos/media" do
+  owner 'vagrant'
+  group 'vagrant'
+  recursive true
+end
+
+execute "create_virtualenv" do
+  user "vagrant"
+  group "vagrant"
+  cwd "/var/www/cirujanos"
+  environment ({'HOME' => '/home/vagrant', 'USER' => 'vagrant'})
+  command <<-EOH
+    virtualenv env
+  EOH
+end
+
+execute "pip_install_requirements" do
+  cwd "/var/www/cirujanos"
+  command <<-EOH
+    source env/bin/activate
+    pip install -r /home/vagrant/Development/projects/cirujanos/requirements.txt
+  EOH
+end
+
+execute "install_python_dev" do
+  command <<-EOH
+    apt-get install python-setuptools python-dev build-essential -y
+    apt-get install libmysqlclient-dev -y
+    apt-get install python-mysqldb -y
+    apt-get install gettext -y
+    apt-get install coffeescript -y
+  EOH
+end
+
 # Database
 
 node.set['mysql']['server_root_password'] = 'root'
