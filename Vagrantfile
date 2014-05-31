@@ -11,7 +11,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # options are documented and commented below. For a complete reference,
   # please see the online documentation at vagrantup.com.
 
-  config.vm.hostname = "cirujanos-vm"
+  config.vm.hostname = "django-vm"
 
   config.ssh.private_key_path = ["~/.vagrant.d/insecure_private_key", "~/.ssh/id_rsa"]
   config.ssh.forward_agent = true
@@ -47,7 +47,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Example for VirtualBox:
   #
   config.vm.provider :virtualbox do |vb|
-    vb.name = "cirujanos-vm"
+    vb.name = "django-vm"
     vb.memory = 512
    end
   #
@@ -71,7 +71,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision :chef_solo do |chef|
     chef.run_list = [
-        "recipe[django-cirujanos::default]"
+        "recipe[django::default]"
     ]
     chef.custom_config_path = "Vagrantfile.chef"
   end

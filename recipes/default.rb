@@ -1,21 +1,71 @@
 #
-# Cookbook Name:: django-cirujanos
+# Cookbook Name:: django
 # Recipe:: default
 #
-# Copyright (C) 2014 YOUR_NAME
+# Copyright (C) 2014 David Sáenz Tagarro
 #
 # All rights reserved - Do Not Redistribute
 #
 
+# Environment
+
 include_recipe "my-environment"
 
-mercurial "/home/vagrant/Development/projects/django-cirujanos" do
+include_recipe "mercurial"
+
+mercurial "/home/vagrant/Development/projects/cirujanos" do
   repository "ssh://hg@bitbucket.org/dsaenztagarro/cirujanos"
   reference "tip"
-  action :sync
+  key "/home/vagrant/.ssh/id_rsa"
+  action :clone
 end
 
 include_recipe "my-environment::permissions"
+
+# Database
+
+node.set['mysql']['server_root_password'] = 'root'
+
+include_recipe "mysql::server"
+include_recipe "mysql::client"
+
+include_recipe 'database'
+include_recipe 'database::mysql'
+
+mysql_connection_info = {
+  :host     => 'localhost',
+  :port     => node['mysql']['port'].to_i,
+  :username => 'root',
+  :password => node['mysql']['server_root_password']
+}
+
+mysql_database 'cirujanos_development' do
+  connection mysql_connection_info
+  action :create
+end
+
+mysql_database 'cirujanos_test' do
+  connection mysql_connection_info
+  action :create
+end
+
+mysql_database_user 'development' do
+  connection    mysql_connection_info
+  password      'development'
+  database_name 'cirujanos_development'
+  host          '%'
+  privileges    [:all]
+  action        :grant
+end
+
+mysql_database_user 'development' do
+  connection    mysql_connection_info
+  password      'development'
+  database_name 'cirujanos_test'
+  host          '%'
+  privileges    [:all]
+  action        :grant
+end
 
 # Backend
 
@@ -31,42 +81,3 @@ apache_site "default" do
 end
 
 include_recipe "python"
-include_recipe "mercurial"
-
-node.set['mysql']['server_root_password'] = 'root'
-include_recipe "mysql::server"
-
-mysql_connection_info = {
-  :host     => 'localhost',
-  :port     => node['mysql']['port'],
-  :username => 'root',
-  :password => node['mysql']['server_root_password']
-}
-
-mysql_database 'cirujanos_development' do
-  connection mysql_connection_info
-  action :create
-end
-
-mysql_database 'cirujanos_test' do
-  connection mysql_connection_info
-  action :create
-end
-
-mysql_database_user 'create_user_development' do
-  connection    mysql_connection_info
-  password      'development'
-  database_name 'cirujanos_development'
-  host          '%'
-  privileges    [:all]
-  action        :grant
-end
-
-mysql_database_user 'create_user_test' do
-  connection    mysql_connection_info
-  password      'development'
-  database_name 'cirujanos_test'
-  host          '%'
-  privileges    [:all]
-  action        :grant
-end

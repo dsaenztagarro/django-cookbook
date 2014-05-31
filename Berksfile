@@ -3,7 +3,13 @@ source "https://api.berkshelf.com"
 
 metadata
 
-cookbook "apache2"
-cookbook "mysql"
-cookbook "python"
+# Environment
+cookbook "my-environment", github: "dsaenztagarro/my-environment-cookbook"
 cookbook "mercurial"
+
+cookbook "apache2"
+cookbook "database"
+cookbook 'mysql'
+
+# Backend
+cookbook "python"
