@@ -29,24 +29,22 @@ directory "/var/www/cirujanos" do
 end
 
 directory "/var/www/cirujanos/static" do
-  owner 'vagrant'
-  group 'vagrant'
+  owner 'www-data'
+  group 'www-data'
   recursive true
 end
 
 directory "/var/www/cirujanos/media" do
-  owner 'vagrant'
-  group 'vagrant'
+  owner 'www-data'
+  group 'www-data'
   recursive true
 end
 
 execute "create_virtualenv" do
-  user "vagrant"
-  group "vagrant"
   cwd "/var/www/cirujanos"
-  environment ({'HOME' => '/home/vagrant', 'USER' => 'vagrant'})
   command <<-EOH
     virtualenv env
+    chown www-data:www-data -R /var/www/cirujanos/env
   EOH
 end
 
@@ -117,6 +115,7 @@ end
 
 include_recipe "apache2"
 include_recipe "apache2::mod_wsgi"
+include_recipe "apache2::mod_xsendfile"
 
 # disable iptables for now
 include_recipe "iptables::disabled"
