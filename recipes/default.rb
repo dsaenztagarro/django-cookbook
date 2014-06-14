@@ -9,6 +9,15 @@
 
 # Environment
 
+# Added pip settings
+cookbook_file 'copy_bashrc' do
+  path '/home/vagrant/.bashrc'
+  source 'bashrc'
+  owner 'vagrant'
+  group 'vagrant'
+  action :create
+end
+
 include_recipe "my-environment"
 
 include_recipe "mercurial"
